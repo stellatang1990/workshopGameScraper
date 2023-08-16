@@ -8,3 +8,4 @@ driver = webdriver.Chrome()
 driver.get("https://steamcommunity.com/workshop/")
 appRows = driver.find_element(By.CLASS_NAME, "workshopAppsRow")
 print(appRows)
+ 
