@@ -41,4 +41,4 @@ print(len(gameUrls))
 print(gameUrls)
 
 # Quit the driver
-driver.quit()
+driver.quit() 
