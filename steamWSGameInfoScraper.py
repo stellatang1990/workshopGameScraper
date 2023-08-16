@@ -2,6 +2,7 @@ import selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+import pandas as pd
 
 # Create a new instance of the Chrome driver
 driver = webdriver.Chrome()
@@ -27,7 +28,7 @@ for i in range(1, int(totalNumPages)):
             print(len(gameUrls))
 
             # Click the next page button
-            if i != int(totalNumPages) and len(gameList) % 8 == 0:
+            if i != int(totalNumPages) and len(gameList) % 4 == 0:
                 driver.find_element(By.ID, "workshop_apps_btn_next").click()
 
             break  # Exit the loop if the actions were successful
