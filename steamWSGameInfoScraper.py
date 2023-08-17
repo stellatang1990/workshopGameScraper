@@ -4,6 +4,34 @@ from selenium.webdriver.common.by import By
 import time
 import pandas as pd
 
+# Returns a list of game URLs from the Steam Workshop
+def getGameUrls(driver, totalNumPages):
+    urls = list()
+
+    # Iterate through all pages 
+    for i in range(1, int(totalNumPages)):
+        time.sleep(0.3)  # Wait for the content to load
+
+        while True:
+            try:
+                gameList = driver.find_elements(By.CLASS_NAME, "app")
+                print("Page:", i)
+                for game in gameList:
+                    urls.append(game.get_attribute("onclick")[19:-1])
+                print(len(urls))
+
+                # Click the next page button
+                if i != int(totalNumPages) and len(gameList) % 4 == 0:
+                    driver.find_element(By.ID, "workshop_apps_btn_next").click()
+
+                break  # Exit the loop if the actions were successful
+
+            except selenium.common.exceptions.StaleElementReferenceException:
+                print("StaleElementReferenceException occurred. Refreshing elements.")
+                continue  # Retry locating the elements
+
+    return urls
+
 # Create a new instance of the Chrome driver
 driver = webdriver.Chrome()
 
@@ -13,33 +41,10 @@ driver.get("https://steamcommunity.com/workshop/?browsesort=Alphabetical&browsef
 totalNumPages = driver.find_elements(By.CLASS_NAME, "workshop_apps_paging_pagelink")[-1].text
 print(totalNumPages)
 
-gameUrls = list()
-
-# Iterate through all pages 
-for i in range(1, int(totalNumPages)):
-    time.sleep(0.1)
-
-    while True:
-        try:
-            gameList = driver.find_elements(By.CLASS_NAME, "app")
-            print("Page:", i)
-            for game in gameList:
-                gameUrls.append(game.get_attribute("onclick")[19:-1])
-            print(len(gameUrls))
-
-            # Click the next page button
-            if i != int(totalNumPages) and len(gameList) % 4 == 0:
-                driver.find_element(By.ID, "workshop_apps_btn_next").click()
-
-            break  # Exit the loop if the actions were successful
-
-        except selenium.common.exceptions.StaleElementReferenceException:
-            print("StaleElementReferenceException occurred. Refreshing elements.")
-            continue  # Retry locating the elements
+gameUrls = getGameUrls(driver, totalNumPages)
 
 # Print the final results
 print(len(gameUrls))
-print(gameUrls)
 
 # Quit the driver
 driver.quit() 
