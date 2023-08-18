@@ -1,0 +1,49 @@
+import selenium
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import time
+import pandas as pd
+from time import sleep
+
+# Create a new instance of the Chrome driver
+driver = webdriver.Chrome()
+
+url = 'https://steamcommunity.com/workshop/'
+driver.get(url)
+
+# Get the total number of pages
+totalNumPages = driver.find_elements(By.CLASS_NAME, "workshop_apps_paging_pagelink")[-1].text
+print(totalNumPages)
+all_urls = []
+total_pages = 254
+# Iterate through all pages
+for _ in range(total_pages):
+
+    elements = driver.find_elements(By.XPATH, "//div[@onclick]")
+
+    page_urls = []
+    for element in elements:
+        if len(page_urls) >= 10:
+            break
+        onclick_value = element.get_attribute("onclick")
+        url = onclick_value.split("'")[1]
+        page_urls.append(url)
+
+    print("URLs on page:", page_urls)
+
+    try:
+            next_page_button = driver.find_element(By.ID, "workshop_apps_btn_next")
+            next_page_button.click()
+    except selenium.common.exceptions.StaleElementReferenceException:
+            print("No 'Next Page' button found or error clicking.")
+            break
+    time.sleep(1)
+
+for url in all_urls:
+    print("URL:", url)
+
+# Quit the driver
+driver.quit()
