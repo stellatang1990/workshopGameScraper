@@ -8,26 +8,28 @@ import pandas as pd
 def getGameUrls(driver, totalNumPages):
     urls = list()
 
-    # Iterate through all pages 
-    for i in range(1, int(totalNumPages)):
-        time.sleep(0.3)  # Wait for the content to load
-
+    for i in range(totalNumPages):
         while True:
             try:
                 gameList = driver.find_elements(By.CLASS_NAME, "app")
-                print("Page:", i)
+                activePage = int(driver.find_element(By.CSS_SELECTOR, "#workshop_apps_links > span.workshop_apps_paging_pagelink.active").text)
+                print("Current Page(IDE):", i + 1)
+                print("Current Page(Browser):", activePage)
+                
+                urlList = list()
+                # Get the URLs of every game in workshop
                 for game in gameList:
-                    urls.append(game.get_attribute("onclick")[19:-1])
-                print(len(urls))
-
+                    urlList.append(game.get_attribute("onclick")[19:-1])
+                print(len(urlList))
                 # Click the next page button
-                if i != int(totalNumPages) and len(gameList) % 4 == 0:
+                if activePage == i + 1:
+                    urls.extend(urlList)
+                    print(len(urls))
                     driver.find_element(By.ID, "workshop_apps_btn_next").click()
-
-                break  # Exit the loop if the actions were successful
-
+                    time.sleep(0.3)
+                    break  # Exit the loop if the actions were successful
             except selenium.common.exceptions.StaleElementReferenceException:
-                print("StaleElementReferenceException occurred. Refreshing elements.")
+                print("StaleElementReferenceException occurred. Refreshing elements and retrying.")
                 continue  # Retry locating the elements
 
     return urls
